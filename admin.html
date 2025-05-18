@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dreamscape Admin</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid #8b5cf6;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 2rem auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body class="bg-black text-white p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Dreamscape Bookings</h1>
+    <div class="space-x-3">
+      <button class="bg-purple-600 px-4 py-2 rounded" id="themeToggle">Toggle Theme</button>
+      <a href="/api/export" class="bg-green-600 px-4 py-2 rounded">Export Excel</a>
+    </div>
+  </div>
+
+  <div id="loader" class="spinner"></div>
+
+  <div class="grid md:grid-cols-2 gap-6 hidden" id="charts">
+    <canvas id="bookingChart"></canvas>
+    <canvas id="consultChart"></canvas>
+  </div>
+
+  <table class="w-full mt-10 hidden" id="bookingTable">
+    <thead>
+      <tr class="bg-gray-800">
+        <th class="text-left px-4 py-2">Name</th>
+        <th class="text-left px-4 py-2">Email</th>
+        <th class="text-left px-4 py-2">Date</th>
+        <th class="text-left px-4 py-2">Video?</th>
+        <th class="text-left px-4 py-2">Timestamp</th>
+      </tr>
+    </thead>
+    <tbody id="booking-body"></tbody>
+  </table>
+
+  <script>
+    const body = document.body;
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      body.classList.toggle("dark");
+    });
+
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/all");
+        const data = await res.json();
+        const tbody = document.getElementById("booking-body");
+        tbody.innerHTML = "";
+
+        let summary = {}, video = 0, nonVideo = 0;
+
+        data.forEach(b => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class='px-4 py-2'>${b.name}</td>
+            <td class='px-4 py-2'>${b.email}</td>
+            <td class='px-4 py-2'>${b.date}</td>
+            <td class='px-4 py-2'>${b.requestVideo ? 'Yes' : 'No'}</td>
+            <td class='px-4 py-2'>${new Date(b.createdAt).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+
+          const d = new Date(b.createdAt).toISOString().split('T')[0];
+          summary[d] = (summary[d] || 0) + 1;
+          b.requestVideo ? video++ : nonVideo++;
+        });
+
+        const daily = Object.entries(summary).map(([d, c]) => ({ date: d, count: c })).sort((a,b)=>a.date.localeCompare(b.date));
+
+        new Chart(document.getElementById("bookingChart"), {
+          type: 'line',
+          data: {
+            labels: daily.map(p => p.date),
+            datasets: [{
+              label: 'Bookings',
+              data: daily.map(p => p.count),
+              fill: true,
+              borderColor: '#a78bfa',
+              backgroundColor: '#8b5cf655'
+            }]
+          },
+          options: { responsive: true }
+        });
+
+        new Chart(document.getElementById("consultChart"), {
+          type: 'pie',
+          data: {
+            labels: ['Video Consult', 'No Video'],
+            datasets: [{
+              label: 'Consults',
+              data: [video, nonVideo],
+              backgroundColor: ['#6366f1', '#ec4899']
+            }]
+          }
+        });
+
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("charts").classList.remove("hidden");
+        document.getElementById("bookingTable").classList.remove("hidden");
+      } catch (err) {
+        alert("Failed to load data");
+      }
+    }
+
+    fetchData();
+    setInterval(fetchData, 180000); // refresh every 3 min
+  </script>
+</body>
+</html>
