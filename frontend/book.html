@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dreamscape Events | Book Your Dream</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="scripts.js"></script>
+</head>
+<body class="bg-black text-white">
+  <header class="fixed top-0 w-full z-50 bg-gradient-to-r from-black to-gray-900 shadow-xl">
+    <nav class="flex justify-between items-center px-6 py-4">
+      <div class="text-2xl font-bold tracking-widest">Dreamscape</div>
+      <ul class="flex gap-6 text-sm font-medium">
+        <li><a href="index.html" class="hover:text-purple-400">Home</a></li>
+        <li><a href="about.html" class="hover:text-purple-400">About</a></li>
+        <li><a href="services.html" class="hover:text-purple-400">Services</a></li>
+        <li><a href="portfolio.html" class="hover:text-purple-400">Gallery</a></li>
+        <li><a href="journey.html" class="hover:text-purple-400">Journey</a></li>
+        <li><a href="testimonials.html" class="hover:text-purple-400">Testimonials</a></li>
+        <li><a href="book.html" class="text-purple-400">Book</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="pt-36 px-6 max-w-2xl mx-auto animate-fade-in">
+    <section class="text-center mb-12">
+      <h1 class="text-4xl font-bold mb-4">Book Your Dream</h1>
+      <p class="text-gray-400">Let’s begin your journey. Share your vision and we’ll start crafting your experience.</p>
+    </section>
+
+    <form id="booking-form" class="space-y-6 bg-gradient-to-b from-gray-900 to-black p-6 rounded-xl shadow-xl">
+      <input type="text" name="name" placeholder="Full Name" required class="w-full px-4 py-3 bg-gray-800 rounded-md text-white" />
+      <input type="email" name="email" placeholder="Email Address" required class="w-full px-4 py-3 bg-gray-800 rounded-md text-white" />
+      <input type="date" name="date" id="booking-date" required class="w-full px-4 py-3 bg-gray-800 rounded-md text-white" />
+      <textarea name="details" placeholder="Tell us about your event..." rows="5" class="w-full px-4 py-3 bg-gray-800 rounded-md text-white"></textarea>
+      <label class="inline-flex items-center text-sm text-purple-300">
+        <input type="checkbox" name="video" class="mr-2" /> Request Video Consultation
+      </label>
+      <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-md font-semibold">Submit</button>
+    </form>
+  </main>
+
+  <footer class="text-center py-6 border-t border-gray-700 mt-24">
+    <p class="text-sm text-gray-500">© 2025 Dreamscape Events. Booking the extraordinary.</p>
+  </footer>
+
+  <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="fixed bottom-6 right-6 bg-purple-700 text-white rounded-full p-3 shadow-lg hover:bg-purple-800">↑</button>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const dateInput = document.getElementById("booking-date");
+      const today = new Date().toISOString().split("T")[0];
+      dateInput.value = today;
+    });
+  </script>
+</body>
+</html>
